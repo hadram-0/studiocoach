@@ -31,13 +31,13 @@ export default function AppHeader() {
   }
 
   return (
-    <header className="bg-primary text-primary-foreground p-4 flex justify-between items-center sticky top-0 z-10 shadow-md">
+    <header className="bg-card text-foreground p-4 flex justify-between items-center sticky top-0 z-10 border-b border-white/10">
       <h1 className="text-xl font-bold">{getTitle()}</h1>
       <Button
         variant="ghost"
         size="icon"
         onClick={handleLogout}
-        className="hover:bg-white/20"
+        className="hover:bg-white/10"
         aria-label="Déconnexion"
       >
         <LogOut className="h-6 w-6" />

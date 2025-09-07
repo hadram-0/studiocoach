@@ -61,12 +61,12 @@ export default function AppHeader() {
   const initials = activeProfile.name.substring(0, 2).toUpperCase();
 
   return (
-    <header className="bg-primary text-primary-foreground p-4 flex justify-between items-center sticky top-0 z-10 shadow-md">
+    <header className="bg-card text-foreground p-4 flex justify-between items-center sticky top-0 z-10 border-b border-white/10">
       <h1 className="text-xl font-bold">{getTitle()}</h1>
       
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="flex items-center gap-2 hover:bg-white/20 h-10 px-3">
+          <Button variant="ghost" className="flex items-center gap-2 hover:bg-white/10 h-10 px-3">
              <Avatar className="h-8 w-8">
                 <AvatarFallback className="bg-primary-foreground text-primary font-bold">{initials}</AvatarFallback>
              </Avatar>
