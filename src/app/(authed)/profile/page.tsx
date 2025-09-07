@@ -1,9 +1,11 @@
-import { mockUser } from "@/lib/data";
+import { mockUser, getUserTeams } from "@/lib/data";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
-export default function ProfilePage() {
+export default async function ProfilePage() {
   const user = mockUser; // In a real app, you would get the logged-in user
+  const userTeams = await getUserTeams(user.id);
+
   const initials = user.displayName.substring(0, 2).toUpperCase();
   const roleLabels: { [key: string]: string } = {
     'coach': 'Coach',
@@ -11,7 +13,7 @@ export default function ProfilePage() {
     'player': 'Joueur',
   };
   const role = roleLabels[user.role] || user.role;
-  const teams = Object.keys(user.teams).join(', ');
+  const teams = userTeams.map(t => t.name).join(', ');
 
 
   return (
