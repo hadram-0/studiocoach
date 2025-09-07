@@ -47,3 +47,11 @@ export type Message = {
 export type TeamWithMembers = Team & {
     members: TeamMember[];
 };
+
+export type Document = {
+    id: string;
+    fileName: string;
+    url: string;
+    teamId: string;
+    category: string;
+}

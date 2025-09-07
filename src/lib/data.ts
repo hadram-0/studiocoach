@@ -1,4 +1,4 @@
-import type { TeamEvent, User, Attendance, Team, TeamMember, Message, TeamWithMembers } from './types';
+import type { TeamEvent, User, Attendance, Team, TeamMember, Message, TeamWithMembers, Document } from './types';
 
 // --- USERS ---
 export const mockUsers: User[] = [
@@ -46,6 +46,14 @@ export const mockAttendance: Record<string, Attendance[]> = {
     'evt_3': [], 'evt_4': [],
 };
 
+// --- DOCUMENTS ---
+export const mockDocuments: Document[] = [
+    { id: 'doc_1', fileName: 'Charte du joueur 2024-2025.pdf', url: '#', teamId: 'team_senior_A', category: 'Officiel' },
+    { id: 'doc_2', fileName: 'Planning des matchs allers.pdf', url: '#', teamId: 'team_senior_A', category: 'Sportif' },
+    { id: 'doc_3', fileName: 'Certificat Médical - Modèle.pdf', url: '#', teamId: 'team_senior_B', category: 'Administratif' },
+    { id: 'doc_4', fileName: 'Organigramme du club.png', url: '#', teamId: 'team_senior_B', category: 'Officiel' },
+];
+
 
 // --- CHAT ---
 const mockMessages: Record<string, Message[]> = {
@@ -89,6 +97,23 @@ export const getAllTeamsWithMembers = async (): Promise<TeamWithMembers[]> => {
         })
     );
     return teamsWithMembers;
+};
+
+// DOCUMENTS
+export const getDocumentsForUserTeams = async (userId: string): Promise<Record<string, Document[]>> => {
+    const user = mockUsers.find(u => u.id === userId);
+    if (!user) return {};
+    
+    const userTeamIds = Object.keys(user.teams);
+    const userTeams = mockTeams.filter(t => userTeamIds.includes(t.id));
+
+    const documentsByTeam: Record<string, Document[]> = {};
+
+    for (const team of userTeams) {
+        documentsByTeam[team.name] = mockDocuments.filter(d => d.teamId === team.id);
+    }
+    
+    return Promise.resolve(documentsByTeam);
 };
 
 

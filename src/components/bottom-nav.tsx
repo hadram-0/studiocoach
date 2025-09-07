@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarDays, Users, UserCircle } from "lucide-react";
+import { CalendarDays, Users, UserCircle, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
   { href: "/dashboard", icon: CalendarDays, label: "Calendrier" },
   { href: "/team", icon: Users, label: "Équipe" },
+  { href: "/documents", icon: FileText, label: "Documents" },
   { href: "/profile", icon: UserCircle, label: "Profil" },
 ];
 
@@ -24,7 +25,7 @@ export default function BottomNav() {
       <div className="flex justify-around p-2">
         {navItems.map((item) => {
           // Special handling for team page to stay active during chat
-          const isActive = item.href === '/team' ? pathname.startsWith('/team') : pathname === item.href;
+          const isActive = item.href === '/team' ? pathname.startsWith('/team') : pathname.startsWith(item.href);
           return (
             <Link
               key={item.href}
