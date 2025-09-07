@@ -13,17 +13,38 @@ import {
   DropdownMenuGroup
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { useState } from 'react';
-import { mockUser } from '@/lib/data'; // Import mockUser for profile info
+import { useState, useEffect } from 'react';
+import { mockUser } from '@/lib/data'; // We'll still use this for the base structure for now
 import { auth } from '@/lib/firebase';
-import { signOut } from 'firebase/auth';
+import { signOut, onAuthStateChanged } from 'firebase/auth';
+import type { User } from 'firebase/auth';
 
 export default function AppHeader() {
   const router = useRouter();
   const pathname = usePathname();
+  const [firebaseUser, setFirebaseUser] = useState<User | null>(null);
   
-  // Mock data for profile switcher
-  const [activeProfile, setActiveProfile] = useState({ id: mockUser.id, name: mockUser.displayName });
+  // Replace mock data with state derived from the firebase user
+  const [activeProfile, setActiveProfile] = useState({ id: '', name: '...' });
+  
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setFirebaseUser(user);
+        // Find the matching user in our mock data to get role/teams info
+        // In a real app, this would come from a 'users' collection in Firestore
+        const appUser = mockUser; // Replace with a fetch to your user database
+        setActiveProfile({ id: user.uid, name: appUser.displayName || user.email || "Utilisateur" });
+      } else {
+        setFirebaseUser(null);
+        router.push('/login');
+      }
+    });
+
+    return () => unsubscribe();
+  }, [router]);
+
+
   const linkedProfiles = [
       { id: 'child_1', name: 'Hugo (Enfant)' },
       { id: 'child_2', name: 'Juliette (Enfant)' },
@@ -84,8 +105,8 @@ export default function AppHeader() {
           <DropdownMenuLabel>Changer de profil</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
-            <DropdownMenuItem onClick={() => switchProfile({id: mockUser.id, name: mockUser.displayName})}>
-                {activeProfile.id === mockUser.id && <Check className="mr-2 h-4 w-4" />}
+            <DropdownMenuItem onClick={() => switchProfile({id: firebaseUser!.uid, name: mockUser.displayName})}>
+                {activeProfile.id === firebaseUser?.uid && <Check className="mr-2 h-4 w-4" />}
                 {mockUser.displayName} (Moi)
             </DropdownMenuItem>
              {linkedProfiles.map(profile => (
