@@ -27,7 +27,7 @@ export default async function ProfilePage() {
       <Card>
         <CardHeader className="items-center text-center">
           <Avatar className="h-24 w-24 mb-2">
-            <AvatarFallback className="text-4xl">{initials}</AvatarFallback>
+            <AvatarFallback className="text-4xl bg-primary-foreground text-primary font-bold">{initials}</AvatarFallback>
           </Avatar>
           <CardTitle className="text-2xl">{user.displayName}</CardTitle>
           <CardDescription>{user.email}</CardDescription>

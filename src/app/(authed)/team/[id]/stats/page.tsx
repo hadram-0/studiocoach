@@ -31,10 +31,10 @@ export default async function TeamStatsPage({ params }: { params: { id: string }
        <div className="flex items-center mb-4">
         <Button asChild variant="ghost" size="icon" className="mr-2">
             <Link href="/team" aria-label="Retour à la liste des équipes">
-                <ArrowLeft className="h-6 w-6 text-gray-600" />
+                <ArrowLeft className="h-6 w-6" />
             </Link>
         </Button>
-        <h2 className="text-2xl font-bold text-gray-800">Statistiques de l'équipe</h2>
+        <h2 className="text-2xl font-bold">Statistiques de l'équipe</h2>
       </div>
 
       <Card>

@@ -44,8 +44,8 @@ function TeamCard({ team, members }: { team: Team; members: TeamMember[] }) {
                 <AvatarFallback>{member.displayName.substring(0, 2).toUpperCase()}</AvatarFallback>
                 </Avatar>
                 <div>
-                <p className="font-semibold text-gray-800">{member.displayName}</p>
-                <p className="text-sm text-gray-500 capitalize">{roleLabels[member.role] || member.role}</p>
+                <p className="font-semibold">{member.displayName}</p>
+                <p className="text-sm text-muted-foreground capitalize">{roleLabels[member.role] || member.role}</p>
                 </div>
             </div>
             ))}
@@ -58,7 +58,7 @@ function TeamCard({ team, members }: { team: Team; members: TeamMember[] }) {
                     Messagerie
                 </Link>
             </Button>
-             <Button asChild>
+             <Button asChild variant="destructive">
                 <Link href={`/team/${team.id}/stats`}>
                     <BarChartHorizontal className="mr-2 h-4 w-4" />
                     Statistiques

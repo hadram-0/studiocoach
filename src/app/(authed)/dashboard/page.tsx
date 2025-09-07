@@ -1,15 +1,20 @@
 import EventCard from "@/components/event-card";
-import { getEvents, mockUser } from "@/lib/data";
+import { getEvents, getCurrentUser } from "@/lib/data";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { TeamEvent } from "@/lib/types";
+import { redirect } from "next/navigation";
 
 export default async function DashboardPage() {
   const allEvents = await getEvents();
-  const user = mockUser; // In a real app, get the current user
+  const user = await getCurrentUser(); 
+
+  if (!user) {
+    redirect('/login');
+  }
 
   const now = new Date();
   const upcomingEvents = allEvents.filter(e => e.startTime >= now);

@@ -9,10 +9,10 @@ export default async function CreateEventPage() {
       <div className="flex items-center mb-4">
         <Button asChild variant="ghost" size="icon" className="mr-2">
             <Link href="/dashboard" aria-label="Retour au tableau de bord">
-                <ArrowLeft className="h-6 w-6 text-gray-600" />
+                <ArrowLeft className="h-6 w-6" />
             </Link>
         </Button>
-        <h2 className="text-2xl font-bold text-gray-800">Créer un événement (1/2)</h2>
+        <h2 className="text-2xl font-bold">Créer un événement (1/2)</h2>
       </div>
 
       <CreateEventForm />

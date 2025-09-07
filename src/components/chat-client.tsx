@@ -66,11 +66,11 @@ export default function ChatClient({ team, members }: { team: Team, members: Tea
             <header className="p-4 flex items-center bg-card border-b sticky top-0 z-10">
                 <Button asChild variant="ghost" size="icon" className="-ml-2 mr-2">
                     <Link href="/team" aria-label="Retour à la liste des équipes">
-                        <ArrowLeft className="h-6 w-6 text-gray-600" />
+                        <ArrowLeft className="h-6 w-6 text-foreground" />
                     </Link>
                 </Button>
                 <div className="flex-1 min-w-0">
-                    <h2 className="text-xl font-bold text-gray-800 truncate">{team.name}</h2>
+                    <h2 className="text-xl font-bold truncate">{team.name}</h2>
                 </div>
                 {isCoach && (
                     <CompositionGeneratorDialog members={members} />

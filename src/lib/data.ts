@@ -17,11 +17,13 @@ export const mockUsers: User[] = [
 ];
 
 export const getCurrentUser = async (): Promise<User | null> => {
+    // This function is now more of a lookup utility, 
+    // the source of truth for the logged-in state is onAuthStateChanged.
     const firebaseUser = auth.currentUser;
     if (!firebaseUser) return null;
 
     // In a real app, you would fetch user data from Firestore based on firebaseUser.uid
-    // For now, we find the user in our mock data.
+    // For now, we find the user in our mock data by email.
     const user = mockUsers.find(u => u.email === firebaseUser.email);
     return user || null;
 }
@@ -113,7 +115,7 @@ export const getAttendanceByEventId = async (eventId: string): Promise<Attendanc
 
 // TEAMS
 export const getUserTeams = async (userId: string): Promise<Team[]> => {
-    const user = mockUsers.find(u => u.id === userId || u.email === auth.currentUser?.email);
+    const user = await getCurrentUser();
     if (!user) return [];
     const teamIds = Object.keys(user.teams);
     return Promise.resolve(mockTeams.filter(t => teamIds.includes(t.id)));
@@ -143,7 +145,7 @@ export const getTeamStats = async (teamId: string): Promise<UserStats[]> => {
 
 // DOCUMENTS
 export const getDocumentsForUserTeams = async (userId: string): Promise<Record<string, Document[]>> => {
-    const user = mockUsers.find(u => u.id === userId || u.email === auth.currentUser?.email);
+    const user = await getCurrentUser();
     if (!user) return {};
     
     const userTeamIds = Object.keys(user.teams);

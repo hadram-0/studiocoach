@@ -21,10 +21,10 @@ export default function EventCard({ event }: EventCardProps) {
 
   return (
     <Link href={`/events/${event.id}`} className="block">
-        <Card className="overflow-hidden cursor-pointer hover:shadow-md transition-shadow duration-300">
+        <Card className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow duration-300">
             <CardContent className="p-4">
                 <div className="flex justify-between items-start mb-2">
-                    <h3 className="font-bold text-lg text-gray-800 pr-2">{event.title}</h3>
+                    <h3 className="font-bold text-lg pr-2">{event.title}</h3>
                     <Badge variant={badgeVariant[event.type] || 'default'} className="whitespace-nowrap">{event.type}</Badge>
                 </div>
                 

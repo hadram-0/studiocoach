@@ -22,11 +22,11 @@ export default async function InvitePlayersPage({ params }: { params: { id: stri
       <div className="flex items-center mb-4">
         <Button asChild variant="ghost" size="icon" className="mr-2">
             <Link href={`/events/create`} aria-label="Retour à l'étape précédente">
-                <ArrowLeft className="h-6 w-6 text-gray-600" />
+                <ArrowLeft className="h-6 w-6" />
             </Link>
         </Button>
         <div className="flex-1">
-            <h2 className="text-2xl font-bold text-gray-800">Inviter des joueurs (2/2)</h2>
+            <h2 className="text-2xl font-bold">Inviter des joueurs (2/2)</h2>
             <p className="text-sm text-muted-foreground">Événement : {displayEvent.title}</p>
         </div>
       </div>

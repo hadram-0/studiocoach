@@ -9,6 +9,7 @@ import { redirect } from "next/navigation";
 export default async function HomePage() {
   const user = await getCurrentUser();
   if (!user) {
+    // This redirect is now mainly a fallback, as the layout should handle it.
     redirect('/login');
   }
 
@@ -32,7 +33,7 @@ export default async function HomePage() {
   return (
     <div className="p-4 space-y-6">
       <div className="text-center py-4">
-        <h1 className="text-2xl font-bold text-gray-800">Bonjour, {user.displayName.split(' ')[0]} !</h1>
+        <h1 className="text-2xl font-bold">Bonjour, {user.displayName.split(' ')[0]} !</h1>
         <p className="text-muted-foreground">Ravis de vous revoir.</p>
       </div>
 
@@ -48,12 +49,12 @@ export default async function HomePage() {
           <CardTitle className="text-lg">Votre Historique</CardTitle>
         </CardHeader>
         <CardContent className="grid grid-cols-2 gap-4 text-center">
-          <div className="p-4 bg-green-50 rounded-lg">
+          <div className="p-4 bg-green-50/10 rounded-lg">
             <CalendarCheck className="h-8 w-8 text-green-600 mx-auto mb-2" />
             <p className="text-2xl font-bold">{userPresenceCount}</p>
             <p className="text-sm text-muted-foreground">Présences</p>
           </div>
-           <div className="p-4 bg-blue-50 rounded-lg">
+           <div className="p-4 bg-blue-50/10 rounded-lg">
             <BarChart className="h-8 w-8 text-blue-600 mx-auto mb-2" />
             <p className="text-2xl font-bold">{presencePercentage}%</p>
             <p className="text-sm text-muted-foreground">Assiduité</p>

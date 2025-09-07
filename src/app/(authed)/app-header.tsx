@@ -14,27 +14,39 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useState, useEffect } from 'react';
-import { mockUser } from '@/lib/data'; // We'll still use this for the base structure for now
+import { mockUsers } from '@/lib/data'; // We'll still use this for the base structure for now
 import { auth } from '@/lib/firebase';
 import { signOut, onAuthStateChanged } from 'firebase/auth';
-import type { User } from 'firebase/auth';
+import type { User as FirebaseUser } from 'firebase/auth';
+import type { User } from '@/lib/types';
+
 
 export default function AppHeader() {
   const router = useRouter();
   const pathname = usePathname();
-  const [firebaseUser, setFirebaseUser] = useState<User | null>(null);
+  const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
+  const [appUser, setAppUser] = useState<User | null>(null);
   
-  // Replace mock data with state derived from the firebase user
-  const [activeProfile, setActiveProfile] = useState({ id: '', name: '...' });
+  const [activeProfile, setActiveProfile] = useState<{ id: string; name: string, role: string } | null>(null);
   
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         setFirebaseUser(user);
-        // Set the active profile based on the logged-in Firebase user
-        setActiveProfile({ id: user.uid, name: user.displayName || user.email || "Utilisateur" });
+        const foundUser = mockUsers.find(u => u.email === user.email);
+        if (foundUser) {
+            setAppUser(foundUser);
+            setActiveProfile({ id: foundUser.id, name: foundUser.displayName, role: foundUser.role });
+        } else {
+            // Handle case where user exists in Firebase Auth but not in our mock data
+             setAppUser(null);
+             setActiveProfile(null);
+             router.push('/login');
+        }
       } else {
         setFirebaseUser(null);
+        setAppUser(null);
+        setActiveProfile(null);
         router.push('/login');
       }
     });
@@ -44,8 +56,8 @@ export default function AppHeader() {
 
 
   const linkedProfiles = [
-      { id: 'child_1', name: 'Hugo (Enfant)' },
-      { id: 'child_2', name: 'Juliette (Enfant)' },
+      { id: 'child_1', name: 'Hugo (Enfant)', role: 'player' },
+      { id: 'child_2', name: 'Juliette (Enfant)', role: 'player' },
   ];
 
   const handleLogout = async () => {
@@ -54,22 +66,27 @@ export default function AppHeader() {
       router.push('/login');
     } catch (error) {
       console.error("Logout failed", error);
-      // Optionally: show an error toast to the user
     }
   };
 
-  const switchProfile = (profile: {id: string, name: string}) => {
+  const switchProfile = (profile: {id: string, name: string, role: string}) => {
       setActiveProfile(profile);
-      // In a real app, this would trigger a global state change and data refetching.
-      // For now, we'll just log it and refresh the page to simulate.
       console.log("Switching to profile:", profile.name);
       router.refresh();
   }
 
-  // Do not show main header on chat pages
   if (pathname.includes('/chat')) {
     return null;
   }
+  
+  if (!activeProfile) {
+    return (
+        <header className="bg-card text-foreground p-4 flex justify-between items-center sticky top-0 z-10 border-b border-white/10">
+             <h1 className="text-xl font-bold">Chargement...</h1>
+        </header>
+    )
+  }
+
 
   const getTitle = () => {
     if (pathname.startsWith('/home')) return 'Accueil';
@@ -103,10 +120,12 @@ export default function AppHeader() {
           <DropdownMenuLabel>Changer de profil</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
-            <DropdownMenuItem onClick={() => switchProfile({id: firebaseUser!.uid, name: firebaseUser?.displayName || firebaseUser?.email || 'Utilisateur'})}>
-                {activeProfile.id === firebaseUser?.uid && <Check className="mr-2 h-4 w-4" />}
-                {firebaseUser?.displayName || firebaseUser?.email} (Moi)
-            </DropdownMenuItem>
+             {appUser && (
+                 <DropdownMenuItem onClick={() => switchProfile({id: appUser.id, name: appUser.displayName, role: appUser.role })}>
+                    {activeProfile.id === appUser.id && <Check className="mr-2 h-4 w-4" />}
+                    {appUser.displayName} (Moi)
+                </DropdownMenuItem>
+             )}
              {linkedProfiles.map(profile => (
                 <DropdownMenuItem key={profile.id} onClick={() => switchProfile(profile)}>
                     {activeProfile.id === profile.id && <Check className="mr-2 h-4 w-4" />}
