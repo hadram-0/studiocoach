@@ -2,8 +2,10 @@ import type { TeamEvent, User, Attendance, Team, TeamMember, Message, TeamWithMe
 import { auth } from './firebase';
 
 // --- USERS ---
+// IMPORTANT: For testing, ensure your Firebase Auth user has the UID 'test_user_uid'
+// or update the ID below to match your test user's UID from the Firebase Console.
 export const mockUsers: User[] = [
-    { id: 'user_coach', displayName: 'Coach Bob', email: 'coach@esdoubs.fr', role: 'coach', teams: { 'team_senior_A': 'coach', 'team_senior_B': 'coach' } },
+    { id: 'test_user_uid', displayName: 'Coach Bob', email: 'coach@esdoubs.fr', role: 'coach', teams: { 'team_senior_A': 'coach', 'team_senior_B': 'coach' } },
     { id: 'user_player_1', displayName: 'Alice Martin', email: 'alice@esdoubs.fr', role: 'player', teams: { 'team_senior_A': 'player' } },
     { id: 'user_player_2', displayName: 'Charlie Petit', email: 'charlie@esdoubs.fr', role: 'player', teams: { 'team_senior_A': 'player' } },
     { id: 'user_player_3', displayName: 'David Grand', email: 'david@esdoubs.fr', role: 'player', teams: { 'team_senior_A': 'player' } },
@@ -24,7 +26,7 @@ export const getCurrentUser = async (): Promise<User | null> => {
 
     // In a real app, you would fetch user data from Firestore based on firebaseUser.uid
     // For now, we find the user in our mock data by email.
-    const user = mockUsers.find(u => u.email === firebaseUser.email);
+    const user = mockUsers.find(u => u.id === firebaseUser.uid);
     return user || null;
 }
 

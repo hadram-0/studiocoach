@@ -19,7 +19,7 @@ export type Attendance = {
 export type UserRole = 'player' | 'coach' | 'admin';
 
 export type User = {
-    id: string;
+    id: string; // This will now correspond to the Firebase Auth UID
     displayName: string;
     email: string;
     role: UserRole;

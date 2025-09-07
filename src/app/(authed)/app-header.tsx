@@ -33,26 +33,33 @@ export default function AppHeader() {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         setFirebaseUser(user);
-        const foundUser = mockUsers.find(u => u.email === user.email);
+        // Find the user in our mock data using the Firebase UID
+        const foundUser = mockUsers.find(u => u.id === user.uid);
         if (foundUser) {
             setAppUser(foundUser);
+            // Set the active profile to the logged-in user by default
             setActiveProfile({ id: foundUser.id, name: foundUser.displayName, role: foundUser.role });
         } else {
-            // Handle case where user exists in Firebase Auth but not in our mock data
-             setAppUser(null);
-             setActiveProfile(null);
-             router.push('/login');
+            // This case handles users that are in Firebase Auth but not in our mock data
+            // Or if the UIDs don't match. In a real app, you might create a new user profile here.
+            // For now, we log them out to prevent access.
+            console.error("User authenticated with Firebase but not found in app data. UID:", user.uid);
+            signOut(auth);
         }
       } else {
+        // No user is signed in.
         setFirebaseUser(null);
         setAppUser(null);
         setActiveProfile(null);
-        router.push('/login');
+        // Redirect to login page if not already there.
+        if (pathname !== '/login') {
+            router.push('/login');
+        }
       }
     });
 
     return () => unsubscribe();
-  }, [router]);
+  }, [router, pathname]);
 
 
   const linkedProfiles = [
@@ -79,14 +86,18 @@ export default function AppHeader() {
     return null;
   }
   
-  if (!activeProfile) {
+  // Display a loading state while we check for the user
+  if (!activeProfile && pathname !== '/login') {
     return (
         <header className="bg-card text-foreground p-4 flex justify-between items-center sticky top-0 z-10 border-b border-white/10">
              <h1 className="text-xl font-bold">Chargement...</h1>
         </header>
     )
   }
-
+  // Don't render the header on the login page
+  if (pathname === '/login') {
+      return null;
+  }
 
   const getTitle = () => {
     if (pathname.startsWith('/home')) return 'Accueil';
