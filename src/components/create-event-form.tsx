@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useFormState } from "react-dom";
 import { Loader2, Sparkles, Users } from "lucide-react";
 
@@ -34,14 +34,19 @@ import { Switch } from "./ui/switch";
 const eventSchema = z.object({
   title: z.string().min(3, { message: "Le titre doit contenir au moins 3 caractères." }),
   type: z.enum(['Match', 'Entraînement', 'Réunion', 'Autre']),
-  date: z.string().refine((val) => !isNaN(Date.parse(val)), { message: "Date et heure invalides." }),
+  date: z.string().refine((val) => val && !isNaN(Date.parse(val)), { message: "La date et l'heure sont requises." }),
   location: z.string().min(3, { message: "Le lieu est requis." }),
   details: z.string().optional(),
   responseDeadline: z.string().optional(),
   guestsVisible: z.boolean().default(true),
 });
 
-const initialState = {
+const initialState: {
+    success: boolean;
+    suggestedLocation?: string;
+    reasoning?: string;
+    error?: string;
+} = {
   success: false,
   suggestedLocation: undefined,
   reasoning: undefined,
@@ -66,6 +71,24 @@ export default function CreateEventForm() {
       guestsVisible: true,
     },
   });
+  
+  useEffect(() => {
+    if (suggestionState.success && suggestionState.suggestedLocation) {
+        form.setValue("location", suggestionState.suggestedLocation);
+        toast({
+            title: "Suggestion IA",
+            description: suggestionState.reasoning,
+        });
+    }
+    if (!suggestionState.success && suggestionState.error) {
+        toast({
+            variant: "destructive",
+            title: "Erreur de suggestion",
+            description: suggestionState.error,
+        });
+    }
+  }, [suggestionState, form, toast]);
+
 
   async function onSubmit(values: z.infer<typeof eventSchema>) {
     setLoading(true);
@@ -87,22 +110,18 @@ export default function CreateEventForm() {
 
   const handleSuggestion = () => {
     const formData = new FormData();
-    formData.append("eventType", form.getValues("type"));
-    formAction(formData);
-  };
-  
-  useState(() => {
-    if (suggestionState.success && suggestionState.suggestedLocation) {
-        form.setValue("location", suggestionState.suggestedLocation);
-    }
-    if (!suggestionState.success && suggestionState.error) {
+    const eventType = form.getValues("type");
+    if(eventType) {
+        formData.append("eventType", eventType);
+        formAction(formData);
+    } else {
         toast({
             variant: "destructive",
-            title: "Erreur de suggestion",
-            description: suggestionState.error,
+            title: "Type d'événement manquant",
+            description: "Veuillez d'abord sélectionner un type d'événement.",
         });
     }
-  });
+  };
 
 
   return (
@@ -167,14 +186,13 @@ export default function CreateEventForm() {
                 <FormControl>
                     <Input placeholder="Stade René Viennet" {...field} />
                 </FormControl>
-                <Button type="button" variant="outline" onClick={handleSuggestion} className="shrink-0">
+                <Button type="button" variant="outline" onClick={handleSuggestion} className="shrink-0" aria-label="Suggérer un lieu">
                     <Sparkles className="h-4 w-4" />
-                    <span className="sr-only">Suggérer un lieu</span>
                 </Button>
               </div>
-              {suggestionState.success && suggestionState.reasoning && (
+              {suggestionState.reasoning && !suggestionState.error && (
                   <FormDescription>
-                    <strong>Suggestion IA:</strong> {suggestionState.reasoning}
+                    {suggestionState.reasoning}
                   </FormDescription>
               )}
               <FormMessage />

@@ -33,11 +33,10 @@ export async function getLocationSuggestion(
 
   // In a real app, this would be dynamically fetched from your database
   const pastEventHistory = `
-    - Match 1 (Stade René Viennet): Bon terrain, mais parking limité.
-    - Entraînement 1 (Stade René Viennet): Idéal pour les séances techniques.
-    - Réunion 1 (Club House): Bien équipé pour les réunions, projecteur disponible.
-    - Match 2 (Stade Bonal): Grande capacité, terrain impeccable.
-    - Entraînement 2 (Gymnase local): Option de repli en cas de mauvais temps.
+    - Match à domicile: Toujours au 'Stade René Viennet'.
+    - Entraînements: Généralement au 'Stade René Viennet', sauf si mauvais temps, auquel cas c'est au 'Gymnase local'.
+    - Réunions: Toujours au 'Club House', car il est équipé d'un projecteur.
+    - Matchs importants: parfois au 'Stade Bonal' pour sa plus grande capacité.
   `;
 
   try {
