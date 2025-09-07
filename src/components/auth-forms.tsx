@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -15,7 +16,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
 import { useState } from "react";
 import { Alert, AlertDescription } from "./ui/alert";
 
@@ -52,48 +52,44 @@ export function LoginForm() {
   }
 
   return (
-    <Card>
-        <CardContent className="pt-6">
-            <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                {error && (
-                    <Alert variant="destructive">
-                        <AlertDescription>{error}</AlertDescription>
-                    </Alert>
-                )}
-                <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                    <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                        <Input placeholder="votre@email.com" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                    </FormItem>
-                )}
-                />
-                <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                    <FormItem>
-                    <FormLabel>Mot de passe</FormLabel>
-                    <FormControl>
-                        <Input type="password" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                    </FormItem>
-                )}
-                />
-                <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? "Connexion..." : "Connexion"}
-                </Button>
-            </form>
-            </Form>
-        </CardContent>
-    </Card>
+    <Form {...form}>
+    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        {error && (
+            <Alert variant="destructive">
+                <AlertDescription>{error}</AlertDescription>
+            </Alert>
+        )}
+        <FormField
+        control={form.control}
+        name="email"
+        render={({ field }) => (
+            <FormItem>
+            <FormLabel>Email</FormLabel>
+            <FormControl>
+                <Input placeholder="votre@email.com" {...field} />
+            </FormControl>
+            <FormMessage />
+            </FormItem>
+        )}
+        />
+        <FormField
+        control={form.control}
+        name="password"
+        render={({ field }) => (
+            <FormItem>
+            <FormLabel>Mot de passe</FormLabel>
+            <FormControl>
+                <Input type="password" {...field} />
+            </FormControl>
+            <FormMessage />
+            </FormItem>
+        )}
+        />
+        <Button type="submit" className="w-full" disabled={loading}>
+            {loading ? "Connexion..." : "Connexion"}
+        </Button>
+    </form>
+    </Form>
   );
 }
 
