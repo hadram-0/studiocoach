@@ -1,11 +1,12 @@
 import { getEventById, getAttendanceByEventId } from "@/lib/data";
 import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Calendar, Clock, Info, MapPin } from "lucide-react";
+import { ArrowLeft, Calendar, Clock, Info, MapPin, Share2 } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import EventDetailsClient from "@/components/event-details-client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
 
 export default async function EventDetailsPage({ params }: { params: { id: string } }) {
   const event = await getEventById(params.id);
@@ -36,6 +37,9 @@ export default async function EventDetailsPage({ params }: { params: { id: strin
               <Badge variant={badgeVariant[event.type] || 'default'} className="mb-1">{event.type}</Badge>
               <h2 className="text-xl font-bold text-gray-800 truncate">{event.title}</h2>
           </div>
+          <Button variant="ghost" size="icon" className="ml-2" aria-label="Exporter l'événement">
+            <Share2 className="h-5 w-5" />
+          </Button>
       </header>
 
       <div className="p-4 space-y-4 flex-1">

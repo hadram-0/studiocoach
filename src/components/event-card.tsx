@@ -3,7 +3,6 @@ import type { TeamEvent } from "@/lib/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock, MapPin } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 interface EventCardProps {
   event: TeamEvent;
@@ -51,10 +50,10 @@ export default function EventCard({ event }: EventCardProps) {
 
 function formatEventDate(date: Date) {
   if (!date) return { date: '', time: '' };
-  const optionsDate: Intl.DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+  const optionsDate: Intl.DateTimeFormatOptions = { weekday: 'long', day: 'numeric', month: 'long' };
   const optionsTime: Intl.DateTimeFormatOptions = { hour: '2-digit', minute: '2-digit', hour12: false };
   return {
-    date: date.toLocaleDateString('fr-FR', optionsDate),
-    time: `à ${date.toLocaleTimeString('fr-FR', optionsTime)}`,
+    date: new Date(date).toLocaleDateString('fr-FR', optionsDate),
+    time: `à ${new Date(date).toLocaleTimeString('fr-FR', optionsTime)}`,
   };
 }
