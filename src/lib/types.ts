@@ -36,3 +36,10 @@ export type TeamMember = {
     displayName: string;
     role: UserRole;
 };
+
+export type Message = {
+    id: string;
+    text: string;
+    senderId: string;
+    timestamp: number; // Using number (Date.now()) for simplicity
+}

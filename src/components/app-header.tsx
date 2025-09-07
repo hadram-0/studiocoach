@@ -1,11 +1,12 @@
 "use client";
 
 import { LogOut } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Button } from './ui/button';
 
 export default function AppHeader() {
   const router = useRouter();
+  const pathname = usePathname();
 
   const handleLogout = async () => {
     // Mock logout
@@ -13,9 +14,23 @@ export default function AppHeader() {
     router.push('/login');
   };
 
+  // Do not show main header on chat pages
+  if (pathname.includes('/chat')) {
+    return null;
+  }
+
+  const getTitle = () => {
+    if (pathname.startsWith('/dashboard')) return 'Calendrier';
+    if (pathname.startsWith('/team')) return 'Équipes';
+    if (pathname.startsWith('/profile')) return 'Profil';
+    if (pathname.startsWith('/events/create')) return 'Créer un événement';
+    if (pathname.startsWith('/events/')) return 'Détails';
+    return 'ES Doubs';
+  }
+
   return (
     <header className="bg-primary text-primary-foreground p-4 flex justify-between items-center sticky top-0 z-10 shadow-md">
-      <h1 className="text-xl font-bold">ES Doubs</h1>
+      <h1 className="text-xl font-bold">{getTitle()}</h1>
       <Button
         variant="ghost"
         size="icon"

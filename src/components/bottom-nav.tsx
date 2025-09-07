@@ -14,11 +14,17 @@ const navItems = [
 export default function BottomNav() {
   const pathname = usePathname();
 
+  // Do not show nav on chat pages
+  if (pathname.includes('/chat')) {
+    return null;
+  }
+
   return (
     <nav className="fixed bottom-0 left-0 right-0 max-w-lg mx-auto bg-card border-t z-10">
       <div className="flex justify-around p-2">
         {navItems.map((item) => {
-          const isActive = pathname === item.href;
+          // Special handling for team page to stay active during chat
+          const isActive = item.href === '/team' ? pathname.startsWith('/team') : pathname === item.href;
           return (
             <Link
               key={item.href}
