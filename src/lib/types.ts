@@ -55,3 +55,14 @@ export type Document = {
     teamId: string;
     category: string;
 }
+
+export type UserStats = {
+    userId: string;
+    displayName: string;
+    teamId: string;
+    eventsAttended: number;
+    eventsMissed: number;
+    eventsMaybe: number;
+    totalEvents: number;
+    attendanceRate: number;
+};

@@ -1,4 +1,4 @@
-import type { TeamEvent, User, Attendance, Team, TeamMember, Message, TeamWithMembers, Document } from './types';
+import type { TeamEvent, User, Attendance, Team, TeamMember, Message, TeamWithMembers, Document, UserStats } from './types';
 
 // --- USERS ---
 export const mockUsers: User[] = [
@@ -30,6 +30,8 @@ export const mockEvents: TeamEvent[] = [
   { id: 'evt_2', title: 'Entraînement tactique', type: 'Entraînement', startTime: new Date(now.getTime() + 4 * 24 * 60 * 60 * 1000), location: 'Stade René Viennet, Doubs', details: 'Session vidéo de 30 minutes avant l\'entraînement.', teamId: 'team_senior_A' },
   { id: 'evt_3', title: 'Réunion de début de saison', type: 'Réunion', startTime: new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000), location: 'Club House', teamId: 'team_senior_A' },
   { id: 'evt_4', title: 'Entraînement physique', type: 'Entraînement', startTime: new Date(now.getTime() + 10 * 24 * 60 * 60 * 1000), location: 'Stade René Viennet, Doubs', details: 'Travail foncier et fractionné.', teamId: 'team_senior_B' },
+  { id: 'evt_past_1', title: 'Match Amical', type: 'Match', startTime: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000), location: 'Stade René Viennet, Doubs', teamId: 'team_senior_A' },
+  { id: 'evt_past_2', title: 'Entraînement', type: 'Entraînement', startTime: new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000), location: 'Gymnase Local', teamId: 'team_senior_A' },
 ];
 
 // --- ATTENDANCE ---
@@ -43,8 +45,29 @@ export const mockAttendance: Record<string, Attendance[]> = {
         { userId: 'user_player_1', userName: 'Alice Martin', status: 'present' },
         { userId: 'user_player_2', userName: 'Charlie Petit', status: 'maybe' },
     ],
+    'evt_past_1': [
+        { userId: 'user_player_1', userName: 'Alice Martin', status: 'present' },
+        { userId: 'user_player_2', userName: 'Charlie Petit', status: 'present' },
+        { userId: 'user_player_3', userName: 'David Grand', status: 'present' },
+    ],
+     'evt_past_2': [
+        { userId: 'user_player_1', userName: 'Alice Martin', status: 'present' },
+        { userId: 'user_player_2', userName: 'Charlie Petit', status: 'absent' },
+        { userId: 'user_player_3', userName: 'David Grand', status: 'present' },
+    ],
     'evt_3': [], 'evt_4': [],
 };
+
+// --- USER STATS (simulated) ---
+export const mockUserStats: UserStats[] = [
+    { userId: 'user_player_1', displayName: 'Alice Martin', teamId: 'team_senior_A', eventsAttended: 28, eventsMissed: 2, eventsMaybe: 1, totalEvents: 31, attendanceRate: 90.3 },
+    { userId: 'user_player_2', displayName: 'Charlie Petit', teamId: 'team_senior_A', eventsAttended: 25, eventsMissed: 5, eventsMaybe: 1, totalEvents: 31, attendanceRate: 80.6 },
+    { userId: 'user_player_3', displayName: 'David Grand', teamId: 'team_senior_A', eventsAttended: 15, eventsMissed: 15, eventsMaybe: 1, totalEvents: 31, attendanceRate: 48.4 },
+    { userId: 'user_player_4', displayName: 'Eva Durand', teamId: 'team_senior_A', eventsAttended: 30, eventsMissed: 1, eventsMaybe: 0, totalEvents: 31, attendanceRate: 96.8 },
+    { userId: 'user_player_5', displayName: 'Frank Leboeuf', teamId: 'team_senior_B', eventsAttended: 29, eventsMissed: 3, eventsMaybe: 2, totalEvents: 34, attendanceRate: 85.3 },
+    { userId: 'user_player_6', displayName: 'Grace Dupont', teamId: 'team_senior_B', eventsAttended: 32, eventsMissed: 1, eventsMaybe: 1, totalEvents: 34, attendanceRate: 94.1 },
+    { userId: 'user_player_7', displayName: 'Hugo Lloris', teamId: 'team_senior_B', eventsAttended: 20, eventsMissed: 10, eventsMaybe: 4, totalEvents: 34, attendanceRate: 58.8 },
+];
 
 // --- DOCUMENTS ---
 export const mockDocuments: Document[] = [
@@ -69,7 +92,7 @@ const messageListeners: Record<string, ((message: Message) => void)[]> = {};
 // --- MOCK API FUNCTIONS ---
 
 // EVENTS
-export const getEvents = async (): Promise<TeamEvent[]> => Promise.resolve(mockEvents.sort((a,b) => a.startTime.getTime() - b.startTime.getTime()));
+export const getEvents = async (): Promise<TeamEvent[]> => Promise.resolve([...mockEvents].sort((a,b) => a.startTime.getTime() - b.startTime.getTime()));
 export const getEventById = async (id: string): Promise<TeamEvent | undefined> => Promise.resolve(mockEvents.find(e => e.id === id));
 
 // ATTENDANCE
@@ -98,6 +121,12 @@ export const getAllTeamsWithMembers = async (): Promise<TeamWithMembers[]> => {
     );
     return teamsWithMembers;
 };
+
+// STATS
+export const getTeamStats = async (teamId: string): Promise<UserStats[]> => {
+    return Promise.resolve(mockUserStats.filter(stat => stat.teamId === teamId));
+}
+
 
 // DOCUMENTS
 export const getDocumentsForUserTeams = async (userId: string): Promise<Record<string, Document[]>> => {

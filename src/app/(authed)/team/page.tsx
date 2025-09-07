@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { MessageSquare } from "lucide-react";
+import { MessageSquare, BarChartHorizontal } from "lucide-react";
 
 export default async function TeamPage() {
   const user = mockUser;
@@ -30,12 +30,6 @@ function TeamCard({ team, members }: { team: Team; members: TeamMember[] }) {
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>{team.name}</CardTitle>
-        <Button asChild>
-            <Link href={`/team/${team.id}/chat`}>
-                <MessageSquare className="mr-2 h-4 w-4" />
-                Messagerie
-            </Link>
-        </Button>
       </CardHeader>
       <CardContent className="space-y-4">
         {members.map((member) => (
@@ -49,6 +43,21 @@ function TeamCard({ team, members }: { team: Team; members: TeamMember[] }) {
             </div>
           </div>
         ))}
+
+        <div className="grid grid-cols-2 gap-2 pt-4 border-t">
+            <Button asChild variant="outline">
+                <Link href={`/team/${team.id}/chat`}>
+                    <MessageSquare className="mr-2 h-4 w-4" />
+                    Messagerie
+                </Link>
+            </Button>
+             <Button asChild>
+                <Link href={`/team/${team.id}/stats`}>
+                    <BarChartHorizontal className="mr-2 h-4 w-4" />
+                    Statistiques
+                </Link>
+            </Button>
+        </div>
       </CardContent>
     </Card>
   );
