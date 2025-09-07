@@ -2,7 +2,7 @@
 
 import { LogOut, Users, Check } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
-import { Button } from './ui/button';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,7 +13,7 @@ import {
   DropdownMenuGroup
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { useState }s from 'react';
+import { useState } from 'react';
 import { mockUser } from '@/lib/data'; // Import mockUser for profile info
 
 export default function AppHeader() {
@@ -53,6 +53,7 @@ export default function AppHeader() {
     if (pathname.startsWith('/documents')) return 'Documents';
     if (pathname.startsWith('/profile')) return 'Profil';
     if (pathname.startsWith('/events/create')) return 'Créer un événement';
+    if (pathname.startsWith('/events/invite')) return 'Inviter des joueurs';
     if (pathname.startsWith('/events/')) return 'Détails';
     return 'ES Doubs';
   }
