@@ -1,0 +1,73 @@
+import { getEventById, getAttendanceByEventId } from "@/lib/data";
+import { notFound } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft, Calendar, Clock, Info, MapPin } from "lucide-react";
+import Link from "next/link";
+import { Badge } from "@/components/ui/badge";
+import EventDetailsClient from "@/components/event-details-client";
+
+export default async function EventDetailsPage({ params }: { params: { id: string } }) {
+  const event = await getEventById(params.id);
+
+  if (!event) {
+    notFound();
+  }
+
+  const initialAttendance = await getAttendanceByEventId(params.id);
+  const { date, time } = formatEventDate(event.startTime);
+
+  const badgeVariant = {
+    'Match': 'destructive',
+    'Entraînement': 'default',
+    'Réunion': 'secondary',
+    'Autre': 'outline',
+  } as const;
+
+  return (
+    <div className="flex flex-col h-full">
+      <header className="p-4 flex items-center bg-card border-b sticky top-0 z-10">
+          <Button asChild variant="ghost" size="icon" className="-ml-2 mr-2">
+              <Link href="/dashboard" aria-label="Retour au tableau de bord">
+                  <ArrowLeft className="h-6 w-6 text-gray-600" />
+              </Link>
+          </Button>
+          <div className="flex-1">
+              <Badge variant={badgeVariant[event.type] || 'default'} className="mb-1">{event.type}</Badge>
+              <h2 className="text-xl font-bold text-gray-800 truncate">{event.title}</h2>
+          </div>
+      </header>
+
+      <div className="p-4 space-y-4 flex-1">
+        <InfoCard icon={Calendar} title="Date et heure" content={`${date} ${time}`} />
+        <InfoCard icon={MapPin} title="Lieu" content={event.location || 'Non spécifié'} />
+        {event.details && (
+            <InfoCard icon={Info} title="Détails" content={event.details} preWrap />
+        )}
+        
+        <EventDetailsClient eventId={event.id} initialAttendance={initialAttendance} />
+      </div>
+    </div>
+  );
+}
+
+function formatEventDate(date: Date) {
+    if (!date) return { date: '', time: '' };
+    const optionsDate: Intl.DateTimeFormatOptions = { weekday: 'long', day: 'numeric', month: 'long' };
+    const optionsTime: Intl.DateTimeFormatOptions = { hour: '2-digit', minute: '2-digit', hour12: false };
+    return {
+      date: date.toLocaleDateString('fr-FR', optionsDate),
+      time: `à ${date.toLocaleTimeString('fr-FR', optionsTime)}`,
+    };
+}
+
+function InfoCard({ icon: Icon, title, content, preWrap = false }: { icon: React.ElementType, title: string, content: string, preWrap?: boolean }) {
+    return (
+        <div className="bg-white p-4 rounded-lg border">
+            <div className="flex items-center text-sm font-semibold text-gray-700 mb-1">
+                <Icon className="h-4 w-4 mr-2 text-muted-foreground" />
+                <span>{title}</span>
+            </div>
+            <p className={`text-gray-600 ${preWrap ? 'whitespace-pre-wrap' : ''}`}>{content}</p>
+        </div>
+    )
+}
