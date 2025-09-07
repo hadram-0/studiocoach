@@ -15,6 +15,8 @@ import {
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useState } from 'react';
 import { mockUser } from '@/lib/data'; // Import mockUser for profile info
+import { auth } from '@/lib/firebase';
+import { signOut } from 'firebase/auth';
 
 export default function AppHeader() {
   const router = useRouter();
@@ -28,9 +30,13 @@ export default function AppHeader() {
   ];
 
   const handleLogout = async () => {
-    // Mock logout
-    await new Promise(resolve => setTimeout(resolve, 500));
-    router.push('/login');
+    try {
+      await signOut(auth);
+      router.push('/login');
+    } catch (error) {
+      console.error("Logout failed", error);
+      // Optionally: show an error toast to the user
+    }
   };
 
   const switchProfile = (profile: {id: string, name: string}) => {

@@ -6,6 +6,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { auth } from "@/lib/firebase";
+import { signInWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
 
 
 import { Button } from "@/components/ui/button";
@@ -19,7 +21,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
-import { Alert, AlertDescription } from "./ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
+import { useToast } from "@/hooks/use-toast";
 
 // --- Login Form ---
 const loginSchema = z.object({
@@ -31,6 +34,7 @@ export function LoginForm() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -43,15 +47,50 @@ export function LoginForm() {
   async function onSubmit(values: z.infer<typeof loginSchema>) {
     setLoading(true);
     setError(null);
-    // Mock authentication
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    if (values.email === "coach@esdoubs.fr" && values.password === "password") {
+    try {
+      await signInWithEmailAndPassword(auth, values.email, values.password);
       router.push("/home");
-    } else {
-      setError("Email ou mot de passe incorrect.");
+    } catch (error: any) {
+      switch (error.code) {
+        case 'auth/user-not-found':
+        case 'auth/wrong-password':
+        case 'auth/invalid-credential':
+          setError("Email ou mot de passe incorrect.");
+          break;
+        default:
+          setError("Une erreur est survenue lors de la connexion.");
+          break;
+      }
     }
     setLoading(false);
   }
+
+  const handlePasswordReset = async () => {
+    const email = form.getValues("email");
+    if (!email) {
+      form.setError("email", { type: "manual", message: "Veuillez d'abord saisir votre adresse e-mail." });
+      return;
+    }
+    
+    setLoading(true);
+    try {
+      await sendPasswordResetEmail(auth, email);
+      toast({
+        title: "E-mail envoyé !",
+        description: "Vérifiez votre boîte de réception pour réinitialiser votre mot de passe.",
+      });
+    } catch (error: any) {
+        console.error("Password reset error", error)
+        toast({
+            variant: "destructive",
+            title: "Erreur",
+            description: "Impossible d'envoyer l'e-mail de réinitialisation. Veuillez vérifier l'adresse e-mail.",
+        });
+    } finally {
+        setLoading(false);
+    }
+  }
+
 
   return (
     <Form {...form}>
@@ -88,9 +127,9 @@ export function LoginForm() {
         )}
         />
          <div className="flex justify-end">
-            <Link href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+            <Button type="button" variant="link" onClick={handlePasswordReset} className="text-sm text-muted-foreground hover:text-primary transition-colors h-auto p-0">
                 Mot de passe oublié ?
-            </Link>
+            </Button>
         </div>
         <Button type="submit" className="w-full" disabled={loading}>
             {loading ? "Connexion..." : "Connexion"}
