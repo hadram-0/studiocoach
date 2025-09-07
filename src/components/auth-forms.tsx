@@ -44,7 +44,7 @@ export function LoginForm() {
     // Mock authentication
     await new Promise(resolve => setTimeout(resolve, 1000));
     if (values.email === "coach@esdoubs.fr" && values.password === "password") {
-      router.push("/dashboard");
+      router.push("/home");
     } else {
       setError("Email ou mot de passe incorrect.");
     }
@@ -124,7 +124,7 @@ export function SignupForm() {
         await new Promise(resolve => setTimeout(resolve, 1000));
         // Mock successful signup
         console.log("Signup successful with:", values);
-        router.push("/dashboard");
+        router.push("/home");
         setLoading(false);
     }
 

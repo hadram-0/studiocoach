@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarDays, Users, UserCircle, FileText } from "lucide-react";
+import { CalendarDays, Users, UserCircle, FileText, Home } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
+  { href: "/home", icon: Home, label: "Accueil" },
   { href: "/dashboard", icon: CalendarDays, label: "Calendrier" },
   { href: "/team", icon: Users, label: "Équipe" },
   { href: "/documents", icon: FileText, label: "Documents" },
@@ -24,8 +25,7 @@ export default function BottomNav() {
     <nav className="fixed bottom-0 left-0 right-0 max-w-lg mx-auto bg-card border-t z-10">
       <div className="flex justify-around p-2">
         {navItems.map((item) => {
-          // Special handling for team page to stay active during chat
-          const isActive = item.href === '/team' ? pathname.startsWith('/team') : pathname.startsWith(item.href);
+          const isActive = pathname === item.href || (pathname.startsWith(item.href) && item.href !== '/home');
           return (
             <Link
               key={item.href}

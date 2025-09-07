@@ -20,6 +20,7 @@ export default function AppHeader() {
   }
 
   const getTitle = () => {
+    if (pathname.startsWith('/home')) return 'Accueil';
     if (pathname.startsWith('/dashboard')) return 'Calendrier';
     if (pathname.startsWith('/team')) return 'Équipes';
     if (pathname.startsWith('/documents')) return 'Documents';
