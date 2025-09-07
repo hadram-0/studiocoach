@@ -13,12 +13,6 @@ export default function LoginPage() {
         
         <LoginForm />
 
-        <p className="text-center text-muted-foreground text-sm mt-6">
-            Pas encore de compte ?{' '}
-            <Link href="/signup" className="font-semibold text-primary hover:underline">
-                Inscrivez-vous
-            </Link>
-        </p>
       </div>
     </div>
   );
