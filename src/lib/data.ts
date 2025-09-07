@@ -1,4 +1,5 @@
 import type { TeamEvent, User, Attendance, Team, TeamMember, Message, TeamWithMembers, Document, UserStats } from './types';
+import { auth } from './firebase';
 
 // --- USERS ---
 export const mockUsers: User[] = [
@@ -11,7 +12,19 @@ export const mockUsers: User[] = [
     { id: 'user_player_6', displayName: 'Grace Dupont', email: 'grace@esdoubs.fr', role: 'player', teams: { 'team_senior_B': 'player' } },
     { id: 'user_player_7', displayName: 'Hugo Lloris', email: 'hugo@esdoubs.fr', role: 'player', teams: { 'team_senior_B': 'player' } },
     { id: 'user_admin', displayName: 'Admin Gerome', email: 'admin@esdoubs.fr', role: 'admin', teams: { 'team_senior_A': 'admin', 'team_senior_B': 'admin' } },
+    // A user that matches the firebase auth user for testing
+    { id: 'q9Qx3aVsc4W11XdvjX9T1PlrR1D3', displayName: 'Test User', email: 'test@test.com', role: 'coach', teams: { 'team_senior_A': 'coach', 'team_senior_B': 'coach' } },
 ];
+
+export const getCurrentUser = async (): Promise<User | null> => {
+    const firebaseUser = auth.currentUser;
+    if (!firebaseUser) return null;
+
+    // In a real app, you would fetch user data from Firestore based on firebaseUser.uid
+    // For now, we find the user in our mock data.
+    const user = mockUsers.find(u => u.email === firebaseUser.email);
+    return user || null;
+}
 
 export const mockUser = mockUsers.find(u => u.id === 'user_coach')!;
 
@@ -100,7 +113,7 @@ export const getAttendanceByEventId = async (eventId: string): Promise<Attendanc
 
 // TEAMS
 export const getUserTeams = async (userId: string): Promise<Team[]> => {
-    const user = mockUsers.find(u => u.id === userId);
+    const user = mockUsers.find(u => u.id === userId || u.email === auth.currentUser?.email);
     if (!user) return [];
     const teamIds = Object.keys(user.teams);
     return Promise.resolve(mockTeams.filter(t => teamIds.includes(t.id)));
@@ -130,7 +143,7 @@ export const getTeamStats = async (teamId: string): Promise<UserStats[]> => {
 
 // DOCUMENTS
 export const getDocumentsForUserTeams = async (userId: string): Promise<Record<string, Document[]>> => {
-    const user = mockUsers.find(u => u.id === userId);
+    const user = mockUsers.find(u => u.id === userId || u.email === auth.currentUser?.email);
     if (!user) return {};
     
     const userTeamIds = Object.keys(user.teams);
@@ -149,11 +162,14 @@ export const getDocumentsForUserTeams = async (userId: string): Promise<Record<s
 // CHAT
 export const getChatMessages = async (teamId: string): Promise<Message[]> => Promise.resolve(mockMessages[teamId] || []);
 
-export const sendMessage = (teamId: string, text: string) => {
+export const sendMessage = async (teamId: string, text: string) => {
+    const user = await getCurrentUser();
+    if (!user) return;
+
     const newMessage: Message = {
         id: `msg_${Date.now()}`,
         text,
-        senderId: mockUser.id,
+        senderId: user.id,
         timestamp: Date.now()
     };
     if (!mockMessages[teamId]) mockMessages[teamId] = [];

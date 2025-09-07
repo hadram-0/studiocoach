@@ -1,9 +1,15 @@
-import { mockUser, getUserTeams } from "@/lib/data";
+import { getCurrentUser, getUserTeams } from "@/lib/data";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { redirect } from "next/navigation";
 
 export default async function ProfilePage() {
-  const user = mockUser; // In a real app, you would get the logged-in user
+  const user = await getCurrentUser();
+
+  if (!user) {
+    redirect('/login');
+  }
+
   const userTeams = await getUserTeams(user.id);
 
   const initials = user.displayName.substring(0, 2).toUpperCase();

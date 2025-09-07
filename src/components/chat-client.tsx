@@ -1,13 +1,12 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import type { Team, TeamMember, Message } from "@/lib/types";
+import type { Team, TeamMember, Message, User } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft, Send, Sparkles, Image as ImageIcon } from "lucide-react";
 import Link from "next/link";
-import { mockUser } from "@/lib/data";
-import { getChatMessages, onNewMessage, sendMessage } from "@/lib/data";
+import { getCurrentUser, getChatMessages, onNewMessage, sendMessage } from "@/lib/data";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import { generateTeamComposition, GenerateTeamCompositionInput } from "@/ai/flows/team-composition-generator";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
@@ -21,10 +20,12 @@ import { useToast } from "@/hooks/use-toast";
 export default function ChatClient({ team, members }: { team: Team, members: TeamMember[] }) {
     const [messages, setMessages] = useState<Message[]>([]);
     const [newMessage, setNewMessage] = useState("");
+    const [currentUser, setCurrentUser] = useState<User | null>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
-    const currentUser = mockUser;
 
     useEffect(() => {
+        getCurrentUser().then(setCurrentUser);
+
         getChatMessages(team.id).then(initialMessages => {
             setMessages(initialMessages);
         });
@@ -43,17 +44,21 @@ export default function ChatClient({ team, members }: { team: Team, members: Tea
 
     const handleSendMessage = (e: React.FormEvent) => {
         e.preventDefault();
-        if (newMessage.trim() === "") return;
+        if (newMessage.trim() === "" || !currentUser) return;
 
         sendMessage(team.id, newMessage);
         setNewMessage("");
     };
     
     const getMemberForMessage = (message: Message) => {
-        if (message.senderId === currentUser.id) return currentUser;
+        if (message.senderId === currentUser?.id) return currentUser;
         return members.find(m => m.id === message.senderId);
     }
     
+    if (!currentUser) {
+        return <div className="flex items-center justify-center h-full">Chargement...</div>;
+    }
+
     const isCoach = currentUser.role === 'coach' || currentUser.role === 'admin';
 
     return (
@@ -218,4 +223,3 @@ function CompositionGeneratorDialog({ members }: { members: TeamMember[] }) {
         </Dialog>
     );
 }
-

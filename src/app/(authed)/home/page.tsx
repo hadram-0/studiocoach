@@ -1,12 +1,17 @@
-import { getEvents, getAttendanceByEventId, mockUser } from "@/lib/data";
+import { getEvents, getAttendanceByEventId, getCurrentUser } from "@/lib/data";
 import type { TeamEvent } from "@/lib/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import EventCard from "@/components/event-card";
 import { BarChart, CalendarCheck, CalendarX } from "lucide-react";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 export default async function HomePage() {
-  const user = mockUser;
+  const user = await getCurrentUser();
+  if (!user) {
+    redirect('/login');
+  }
+
   const allEvents = await getEvents();
   const now = new Date();
   

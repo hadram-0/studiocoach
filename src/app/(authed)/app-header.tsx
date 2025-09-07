@@ -31,10 +31,8 @@ export default function AppHeader() {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         setFirebaseUser(user);
-        // Find the matching user in our mock data to get role/teams info
-        // In a real app, this would come from a 'users' collection in Firestore
-        const appUser = mockUser; // Replace with a fetch to your user database
-        setActiveProfile({ id: user.uid, name: appUser.displayName || user.email || "Utilisateur" });
+        // Set the active profile based on the logged-in Firebase user
+        setActiveProfile({ id: user.uid, name: user.displayName || user.email || "Utilisateur" });
       } else {
         setFirebaseUser(null);
         router.push('/login');
@@ -105,9 +103,9 @@ export default function AppHeader() {
           <DropdownMenuLabel>Changer de profil</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
-            <DropdownMenuItem onClick={() => switchProfile({id: firebaseUser!.uid, name: mockUser.displayName})}>
+            <DropdownMenuItem onClick={() => switchProfile({id: firebaseUser!.uid, name: firebaseUser?.displayName || firebaseUser?.email || 'Utilisateur'})}>
                 {activeProfile.id === firebaseUser?.uid && <Check className="mr-2 h-4 w-4" />}
-                {mockUser.displayName} (Moi)
+                {firebaseUser?.displayName || firebaseUser?.email} (Moi)
             </DropdownMenuItem>
              {linkedProfiles.map(profile => (
                 <DropdownMenuItem key={profile.id} onClick={() => switchProfile(profile)}>

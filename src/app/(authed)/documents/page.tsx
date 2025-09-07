@@ -1,11 +1,15 @@
-import { mockUser, getDocumentsForUserTeams } from "@/lib/data";
+import { getCurrentUser, getDocumentsForUserTeams } from "@/lib/data";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FileText } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
+import { redirect } from "next/navigation";
 
 export default async function DocumentsPage() {
-  const user = mockUser;
+  const user = await getCurrentUser();
+  if (!user) {
+    redirect('/login');
+  }
   const documentsByTeam = await getDocumentsForUserTeams(user.id);
 
   const hasDocuments = Object.values(documentsByTeam).some(docs => docs.length > 0);

@@ -1,13 +1,18 @@
-import { mockUser, getUserTeams, getTeamMembers } from "@/lib/data";
+import { getCurrentUser, getUserTeams, getTeamMembers } from "@/lib/data";
 import type { Team, TeamMember } from "@/lib/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { MessageSquare, BarChartHorizontal } from "lucide-react";
+import { redirect } from "next/navigation";
 
 export default async function TeamPage() {
-  const user = mockUser;
+  const user = await getCurrentUser();
+  if (!user) {
+    redirect('/login');
+  }
+
   const teams = await getUserTeams(user.id);
 
   return (
