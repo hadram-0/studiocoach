@@ -21,7 +21,7 @@ export default async function TeamPage() {
 }
 
 function TeamCard({ team, members }: { team: Team; members: TeamMember[] }) {
-    const roleLabels = {
+    const roleLabels: { [key: string]: string } = {
         'coach': 'Coach',
         'admin': 'Admin',
         'player': 'Joueur',
@@ -32,17 +32,19 @@ function TeamCard({ team, members }: { team: Team; members: TeamMember[] }) {
         <CardTitle>{team.name}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        {members.map((member) => (
-          <div key={member.id} className="flex items-center space-x-3">
-            <Avatar>
-              <AvatarFallback>{member.displayName.substring(0, 2).toUpperCase()}</AvatarFallback>
-            </Avatar>
-            <div>
-              <p className="font-semibold text-gray-800">{member.displayName}</p>
-              <p className="text-sm text-gray-500 capitalize">{roleLabels[member.role] || member.role}</p>
+        <div className="space-y-3">
+            {members.map((member) => (
+            <div key={member.id} className="flex items-center space-x-3">
+                <Avatar>
+                <AvatarFallback>{member.displayName.substring(0, 2).toUpperCase()}</AvatarFallback>
+                </Avatar>
+                <div>
+                <p className="font-semibold text-gray-800">{member.displayName}</p>
+                <p className="text-sm text-gray-500 capitalize">{roleLabels[member.role] || member.role}</p>
+                </div>
             </div>
-          </div>
-        ))}
+            ))}
+        </div>
 
         <div className="grid grid-cols-2 gap-2 pt-4 border-t">
             <Button asChild variant="outline">
