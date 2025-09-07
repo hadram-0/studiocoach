@@ -1,13 +1,16 @@
-import type { TeamEvent, User, Attendance, Team, TeamMember, Message } from './types';
+import type { TeamEvent, User, Attendance, Team, TeamMember, Message, TeamWithMembers } from './types';
 
 // --- USERS ---
 export const mockUsers: User[] = [
-    { id: 'user_coach', displayName: 'Coach Bob', email: 'coach@esdoubs.fr', role: 'coach', teams: { 'team_senior_A': 'coach' } },
+    { id: 'user_coach', displayName: 'Coach Bob', email: 'coach@esdoubs.fr', role: 'coach', teams: { 'team_senior_A': 'coach', 'team_senior_B': 'coach' } },
     { id: 'user_player_1', displayName: 'Alice Martin', email: 'alice@esdoubs.fr', role: 'player', teams: { 'team_senior_A': 'player' } },
     { id: 'user_player_2', displayName: 'Charlie Petit', email: 'charlie@esdoubs.fr', role: 'player', teams: { 'team_senior_A': 'player' } },
     { id: 'user_player_3', displayName: 'David Grand', email: 'david@esdoubs.fr', role: 'player', teams: { 'team_senior_A': 'player' } },
     { id: 'user_player_4', displayName: 'Eva Durand', email: 'eva@esdoubs.fr', role: 'player', teams: { 'team_senior_A': 'player' } },
-    { id: 'user_admin', displayName: 'Admin Gerome', email: 'admin@esdoubs.fr', role: 'admin', teams: { 'team_senior_A': 'admin' } },
+    { id: 'user_player_5', displayName: 'Frank Leboeuf', email: 'frank@esdoubs.fr', role: 'player', teams: { 'team_senior_B': 'player' } },
+    { id: 'user_player_6', displayName: 'Grace Dupont', email: 'grace@esdoubs.fr', role: 'player', teams: { 'team_senior_B': 'player' } },
+    { id: 'user_player_7', displayName: 'Hugo Lloris', email: 'hugo@esdoubs.fr', role: 'player', teams: { 'team_senior_B': 'player' } },
+    { id: 'user_admin', displayName: 'Admin Gerome', email: 'admin@esdoubs.fr', role: 'admin', teams: { 'team_senior_A': 'admin', 'team_senior_B': 'admin' } },
 ];
 
 export const mockUser = mockUsers.find(u => u.id === 'user_coach')!;
@@ -16,6 +19,7 @@ export const mockUser = mockUsers.find(u => u.id === 'user_coach')!;
 // --- TEAMS ---
 export const mockTeams: Team[] = [
     { id: 'team_senior_A', name: 'Seniors A' },
+    { id: 'team_senior_B', name: 'Seniors B' },
 ];
 
 
@@ -25,7 +29,7 @@ export const mockEvents: TeamEvent[] = [
   { id: 'evt_1', title: 'Match vs. FC Sochaux', type: 'Match', startTime: new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000), location: 'Stade Bonal, Sochaux', details: 'Rendez-vous au stade à 18h00. Maillot bleu.', teamId: 'team_senior_A' },
   { id: 'evt_2', title: 'Entraînement tactique', type: 'Entraînement', startTime: new Date(now.getTime() + 4 * 24 * 60 * 60 * 1000), location: 'Stade René Viennet, Doubs', details: 'Session vidéo de 30 minutes avant l\'entraînement.', teamId: 'team_senior_A' },
   { id: 'evt_3', title: 'Réunion de début de saison', type: 'Réunion', startTime: new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000), location: 'Club House', teamId: 'team_senior_A' },
-  { id: 'evt_4', title: 'Entraînement physique', type: 'Entraînement', startTime: new Date(now.getTime() + 10 * 24 * 60 * 60 * 1000), location: 'Stade René Viennet, Doubs', details: 'Travail foncier et fractionné.', teamId: 'team_senior_A' },
+  { id: 'evt_4', title: 'Entraînement physique', type: 'Entraînement', startTime: new Date(now.getTime() + 10 * 24 * 60 * 60 * 1000), location: 'Stade René Viennet, Doubs', details: 'Travail foncier et fractionné.', teamId: 'team_senior_B' },
 ];
 
 // --- ATTENDANCE ---
@@ -77,6 +81,16 @@ export const getTeamMembers = async (teamId: string): Promise<TeamMember[]> => {
         .map(u => ({ id: u.id, displayName: u.displayName, role: u.teams[teamId] }))
     );
 }
+export const getAllTeamsWithMembers = async (): Promise<TeamWithMembers[]> => {
+    const teamsWithMembers = await Promise.all(
+        mockTeams.map(async (team) => {
+            const members = await getTeamMembers(team.id);
+            return { ...team, members };
+        })
+    );
+    return teamsWithMembers;
+};
+
 
 // CHAT
 export const getChatMessages = async (teamId: string): Promise<Message[]> => Promise.resolve(mockMessages[teamId] || []);

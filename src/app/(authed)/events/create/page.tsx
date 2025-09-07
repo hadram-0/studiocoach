@@ -2,8 +2,11 @@ import CreateEventForm from "@/components/create-event-form";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { getAllTeamsWithMembers } from "@/lib/data";
 
-export default function CreateEventPage() {
+export default async function CreateEventPage() {
+  const teamsWithMembers = await getAllTeamsWithMembers();
+
   return (
     <div className="p-4">
       <div className="flex items-center mb-4">
@@ -15,7 +18,7 @@ export default function CreateEventPage() {
         <h2 className="text-2xl font-bold text-gray-800">Créer un événement</h2>
       </div>
 
-      <CreateEventForm />
+      <CreateEventForm teams={teamsWithMembers} />
     </div>
   );
 }

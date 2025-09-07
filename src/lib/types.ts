@@ -43,3 +43,7 @@ export type Message = {
     senderId: string;
     timestamp: number; // Using number (Date.now()) for simplicity
 }
+
+export type TeamWithMembers = Team & {
+    members: TeamMember[];
+};

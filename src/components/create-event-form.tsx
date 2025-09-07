@@ -27,8 +27,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { getLocationSuggestion } from "@/lib/actions";
+import type { TeamWithMembers } from "@/lib/types";
 
 const eventSchema = z.object({
   title: z.string().min(3, { message: "Le titre doit contenir au moins 3 caractères." }),
@@ -36,6 +44,7 @@ const eventSchema = z.object({
   date: z.string().refine((val) => !isNaN(Date.parse(val)), { message: "Date et heure invalides." }),
   location: z.string().min(3, { message: "Le lieu est requis." }),
   details: z.string().optional(),
+  invitedPlayers: z.array(z.string()).min(1, "Vous devez inviter au moins un joueur."),
 });
 
 const initialState = {
@@ -45,7 +54,7 @@ const initialState = {
   error: undefined,
 };
 
-export default function CreateEventForm() {
+export default function CreateEventForm({ teams }: { teams: TeamWithMembers[] }) {
   const router = useRouter();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -59,6 +68,7 @@ export default function CreateEventForm() {
       type: "Match",
       location: "",
       details: "",
+      invitedPlayers: [],
     },
   });
 
@@ -81,7 +91,6 @@ export default function CreateEventForm() {
     formAction(formData);
   };
   
-  // Effect to update form value when suggestion arrives
   useState(() => {
     if (suggestionState.success && suggestionState.suggestedLocation) {
         form.setValue("location", suggestionState.suggestedLocation);
@@ -172,6 +181,67 @@ export default function CreateEventForm() {
             </FormItem>
           )}
         />
+
+        <FormField
+          control={form.control}
+          name="invitedPlayers"
+          render={() => (
+            <FormItem>
+              <div className="mb-4">
+                <FormLabel className="text-base">Inviter des joueurs</FormLabel>
+                <FormDescription>
+                  Sélectionnez les joueurs à convoquer pour cet événement.
+                </FormDescription>
+              </div>
+              <Accordion type="multiple" className="w-full">
+                {teams.map((team) => (
+                  <AccordionItem key={team.id} value={team.id}>
+                    <AccordionTrigger className="font-semibold">{team.name}</AccordionTrigger>
+                    <AccordionContent>
+                      <div className="space-y-2">
+                      {team.members.map((item) => (
+                        <FormField
+                          key={item.id}
+                          control={form.control}
+                          name="invitedPlayers"
+                          render={({ field }) => {
+                            return (
+                              <FormItem
+                                key={item.id}
+                                className="flex flex-row items-start space-x-3 space-y-0"
+                              >
+                                <FormControl>
+                                  <Checkbox
+                                    checked={field.value?.includes(item.id)}
+                                    onCheckedChange={(checked) => {
+                                      return checked
+                                        ? field.onChange([...field.value, item.id])
+                                        : field.onChange(
+                                            field.value?.filter(
+                                              (value) => value !== item.id
+                                            )
+                                          )
+                                    }}
+                                  />
+                                </FormControl>
+                                <FormLabel className="font-normal">
+                                  {item.displayName}
+                                </FormLabel>
+                              </FormItem>
+                            )
+                          }}
+                        />
+                      ))}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
         <FormField
           control={form.control}
           name="details"
