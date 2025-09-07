@@ -27,16 +27,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { getLocationSuggestion } from "@/lib/actions";
-import type { TeamWithMembers } from "@/lib/types";
 
 const eventSchema = z.object({
   title: z.string().min(3, { message: "Le titre doit contenir au moins 3 caractères." }),
@@ -44,7 +36,6 @@ const eventSchema = z.object({
   date: z.string().refine((val) => !isNaN(Date.parse(val)), { message: "Date et heure invalides." }),
   location: z.string().min(3, { message: "Le lieu est requis." }),
   details: z.string().optional(),
-  invitedPlayers: z.array(z.string()).min(1, "Vous devez inviter au moins un joueur."),
 });
 
 const initialState = {
@@ -54,7 +45,7 @@ const initialState = {
   error: undefined,
 };
 
-export default function CreateEventForm({ teams }: { teams: TeamWithMembers[] }) {
+export default function CreateEventForm() {
   const router = useRouter();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -68,7 +59,6 @@ export default function CreateEventForm({ teams }: { teams: TeamWithMembers[] })
       type: "Match",
       location: "",
       details: "",
-      invitedPlayers: [],
     },
   });
 
@@ -77,12 +67,17 @@ export default function CreateEventForm({ teams }: { teams: TeamWithMembers[] })
     // Mock event creation
     console.log("Creating event:", values);
     await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // In a real app, you would get the new event ID from the backend
+    const newEventId = `evt_${Date.now()}`; 
+
     toast({
-      title: "Événement créé !",
-      description: "Votre événement a été ajouté au calendrier.",
+      title: "Événement sauvegardé !",
+      description: "Passez à l'étape suivante pour inviter les joueurs.",
     });
-    router.push("/dashboard");
-    setLoading(false);
+
+    // Redirect to the new invite page
+    router.push(`/events/${newEventId}/invite`);
   }
 
   const handleSuggestion = () => {
@@ -181,66 +176,6 @@ export default function CreateEventForm({ teams }: { teams: TeamWithMembers[] })
             </FormItem>
           )}
         />
-
-        <FormField
-          control={form.control}
-          name="invitedPlayers"
-          render={() => (
-            <FormItem>
-              <div className="mb-4">
-                <FormLabel className="text-base">Inviter des joueurs</FormLabel>
-                <FormDescription>
-                  Sélectionnez les joueurs à convoquer pour cet événement.
-                </FormDescription>
-              </div>
-              <Accordion type="multiple" className="w-full">
-                {teams.map((team) => (
-                  <AccordionItem key={team.id} value={team.id}>
-                    <AccordionTrigger className="font-semibold">{team.name}</AccordionTrigger>
-                    <AccordionContent>
-                      <div className="space-y-2">
-                      {team.members.map((item) => (
-                        <FormField
-                          key={item.id}
-                          control={form.control}
-                          name="invitedPlayers"
-                          render={({ field }) => {
-                            return (
-                              <FormItem
-                                key={item.id}
-                                className="flex flex-row items-start space-x-3 space-y-0"
-                              >
-                                <FormControl>
-                                  <Checkbox
-                                    checked={field.value?.includes(item.id)}
-                                    onCheckedChange={(checked) => {
-                                      return checked
-                                        ? field.onChange([...field.value, item.id])
-                                        : field.onChange(
-                                            field.value?.filter(
-                                              (value) => value !== item.id
-                                            )
-                                          )
-                                    }}
-                                  />
-                                </FormControl>
-                                <FormLabel className="font-normal">
-                                  {item.displayName}
-                                </FormLabel>
-                              </FormItem>
-                            )
-                          }}
-                        />
-                      ))}
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                ))}
-              </Accordion>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
         
         <FormField
           control={form.control}
@@ -256,7 +191,7 @@ export default function CreateEventForm({ teams }: { teams: TeamWithMembers[] })
           )}
         />
         <Button type="submit" variant="destructive" className="w-full" disabled={loading}>
-          {loading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Création...</> : "Créer l'événement"}
+          {loading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Sauvegarde...</> : "Suivant : Inviter les joueurs"}
         </Button>
       </form>
     </Form>
