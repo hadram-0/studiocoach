@@ -6,7 +6,7 @@ import { z } from "zod";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useFormState } from "react-dom";
-import { Loader2, Sparkles } from "lucide-react";
+import { Loader2, Sparkles, Users } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { getLocationSuggestion } from "@/lib/actions";
+import { Switch } from "./ui/switch";
 
 const eventSchema = z.object({
   title: z.string().min(3, { message: "Le titre doit contenir au moins 3 caractères." }),
@@ -36,6 +37,8 @@ const eventSchema = z.object({
   date: z.string().refine((val) => !isNaN(Date.parse(val)), { message: "Date et heure invalides." }),
   location: z.string().min(3, { message: "Le lieu est requis." }),
   details: z.string().optional(),
+  responseDeadline: z.string().optional(),
+  guestsVisible: z.boolean().default(true),
 });
 
 const initialState = {
@@ -59,6 +62,8 @@ export default function CreateEventForm() {
       type: "Match",
       location: "",
       details: "",
+      responseDeadline: "none",
+      guestsVisible: true,
     },
   });
 
@@ -190,6 +195,60 @@ export default function CreateEventForm() {
             </FormItem>
           )}
         />
+        
+        <FormField
+          control={form.control}
+          name="responseDeadline"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Délai de réponse</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Définir un délai pour la réponse..." />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="none">Sans limite</SelectItem>
+                  <SelectItem value="1h">1 heure avant</SelectItem>
+                  <SelectItem value="2h">2 heures avant</SelectItem>
+                  <SelectItem value="3h">3 heures avant</SelectItem>
+                  <SelectItem value="6h">6 heures avant</SelectItem>
+                  <SelectItem value="12h">12 heures avant</SelectItem>
+                  <SelectItem value="24h">24 heures avant</SelectItem>
+                  <SelectItem value="48h">48 heures avant</SelectItem>
+                  <SelectItem value="72h">72 heures avant</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormDescription>
+                Les joueurs seront notifiés si leur réponse est attendue.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        <FormField
+          control={form.control}
+          name="guestsVisible"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+              <div className="space-y-0.5">
+                <FormLabel className="flex items-center"><Users className="mr-2 h-4 w-4"/>Liste des invités visible</FormLabel>
+                <FormDescription>
+                  Si activé, les joueurs invités pourront voir qui d'autre est invité.
+                </FormDescription>
+              </div>
+              <FormControl>
+                <Switch
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+
         <Button type="submit" variant="destructive" className="w-full" disabled={loading}>
           {loading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Sauvegarde...</> : "Suivant : Inviter les joueurs"}
         </Button>
