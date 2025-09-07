@@ -16,10 +16,23 @@ export type Attendance = {
   status: AttendanceStatus;
 };
 
+export type UserRole = 'player' | 'coach' | 'admin';
+
 export type User = {
     id: string;
     displayName: string;
     email: string;
-    role: 'player' | 'coach' | 'admin';
-    teams: Record<string, 'player' | 'coach'>;
+    role: UserRole;
+    teams: Record<string, UserRole>;
+};
+
+export type Team = {
+    id: string;
+    name: string;
+};
+
+export type TeamMember = {
+    id: string;
+    displayName: string;
+    role: UserRole;
 };

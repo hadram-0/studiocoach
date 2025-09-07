@@ -1,12 +1,21 @@
-import type { TeamEvent, User, Attendance } from './types';
+import type { TeamEvent, User, Attendance, Team, TeamMember } from './types';
 
-export const mockUser: User = {
-    id: 'user_123',
-    displayName: 'Jean Dupont',
-    email: 'jean.dupont@example.com',
-    role: 'coach',
-    teams: { 'team_senior_A': 'coach' }
-};
+export const mockUsers: User[] = [
+    { id: 'user_coach', displayName: 'Coach Bob', email: 'coach@esdoubs.fr', role: 'coach', teams: { 'team_senior_A': 'coach' } },
+    { id: 'user_player_1', displayName: 'Alice Martin', email: 'alice@esdoubs.fr', role: 'player', teams: { 'team_senior_A': 'player' } },
+    { id: 'user_player_2', displayName: 'Charlie Petit', email: 'charlie@esdoubs.fr', role: 'player', teams: { 'team_senior_A': 'player' } },
+    { id: 'user_player_3', displayName: 'David Grand', email: 'david@esdoubs.fr', role: 'player', teams: { 'team_senior_A': 'player' } },
+    { id: 'user_player_4', displayName: 'Eva Durand', email: 'eva@esdoubs.fr', role: 'player', teams: { 'team_senior_A': 'player' } },
+    { id: 'user_admin', displayName: 'Admin Gerome', email: 'admin@esdoubs.fr', role: 'admin', teams: { 'team_senior_A': 'admin' } },
+];
+
+// For simplicity, we'll use the first user as the "logged in" user. 
+// In a real app, this would come from an auth context.
+export const mockUser = mockUsers.find(u => u.role === 'coach')!;
+
+export const mockTeams: Team[] = [
+    { id: 'team_senior_A', name: 'Seniors A' },
+];
 
 const now = new Date();
 
@@ -50,20 +59,19 @@ export const mockEvents: TeamEvent[] = [
 
 export const mockAttendance: Record<string, Attendance[]> = {
     'evt_1': [
-        { userId: 'user_1', userName: 'Alice Martin', status: 'present' },
-        { userId: 'user_2', userName: 'Bob Durand', status: 'present' },
-        { userId: 'user_3', userName: 'Charlie Petit', status: 'maybe' },
-        { userId: 'user_4', userName: 'David Grand', status: 'absent' },
+        { userId: 'user_player_1', userName: 'Alice Martin', status: 'present' },
+        { userId: 'user_player_2', userName: 'Charlie Petit', status: 'maybe' },
+        { userId: 'user_player_3', userName: 'David Grand', status: 'absent' },
     ],
     'evt_2': [
-        { userId: 'user_1', userName: 'Alice Martin', status: 'present' },
-        { userId: 'user_2', userName: 'Bob Durand', status: 'maybe' },
+        { userId: 'user_player_1', userName: 'Alice Martin', status: 'present' },
+        { userId: 'user_player_2', userName: 'Charlie Petit', status: 'maybe' },
     ],
     'evt_3': [],
     'evt_4': [],
 };
 
-// Mock functions to simulate fetching data
+// --- Mock functions to simulate fetching data ---
 export const getEvents = async (): Promise<TeamEvent[]> => {
   return new Promise(resolve => setTimeout(() => resolve(mockEvents.sort((a,b) => a.startTime.getTime() - b.startTime.getTime())), 500));
 };
@@ -75,3 +83,22 @@ export const getEventById = async (id: string): Promise<TeamEvent | undefined> =
 export const getAttendanceByEventId = async (eventId: string): Promise<Attendance[]> => {
   return new Promise(resolve => setTimeout(() => resolve(mockAttendance[eventId] || []), 300));
 };
+
+export const getUserTeams = async (userId: string): Promise<Team[]> => {
+    const user = mockUsers.find(u => u.id === userId);
+    if (!user) return [];
+    const teamIds = Object.keys(user.teams);
+    const teams = mockTeams.filter(t => teamIds.includes(t.id));
+    return new Promise(resolve => setTimeout(() => resolve(teams), 200));
+}
+
+export const getTeamMembers = async (teamId: string): Promise<TeamMember[]> => {
+    const members = mockUsers
+        .filter(u => u.teams[teamId])
+        .map(u => ({
+            id: u.id,
+            displayName: u.displayName,
+            role: u.teams[teamId]
+        }));
+    return new Promise(resolve => setTimeout(() => resolve(members), 200));
+}
