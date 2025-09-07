@@ -1,5 +1,5 @@
 import ChatClient from "@/components/chat-client";
-import { getTeamById, getTeamMembers }_from "@/lib/data";
+import { getTeamById, getTeamMembers } from "@/lib/data";
 import { notFound } from "next/navigation";
 
 export default async function ChatPage({ params }: { params: { id: string } }) {
