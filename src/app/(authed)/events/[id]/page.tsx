@@ -5,6 +5,7 @@ import { ArrowLeft, Calendar, Clock, Info, MapPin } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import EventDetailsClient from "@/components/event-details-client";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default async function EventDetailsPage({ params }: { params: { id: string } }) {
   const event = await getEventById(params.id);
@@ -31,17 +32,29 @@ export default async function EventDetailsPage({ params }: { params: { id: strin
                   <ArrowLeft className="h-6 w-6 text-gray-600" />
               </Link>
           </Button>
-          <div className="flex-1">
+          <div className="flex-1 min-w-0">
               <Badge variant={badgeVariant[event.type] || 'default'} className="mb-1">{event.type}</Badge>
               <h2 className="text-xl font-bold text-gray-800 truncate">{event.title}</h2>
           </div>
       </header>
 
       <div className="p-4 space-y-4 flex-1">
-        <InfoCard icon={Calendar} title="Date et heure" content={`${date} ${time}`} />
-        <InfoCard icon={MapPin} title="Lieu" content={event.location || 'Non spécifié'} />
+        <Card>
+            <CardContent className="p-4 space-y-2">
+                <InfoItem icon={Calendar} content={`${date} ${time}`} />
+                <InfoItem icon={MapPin} content={event.location || 'Non spécifié'} />
+            </CardContent>
+        </Card>
+
         {event.details && (
-            <InfoCard icon={Info} title="Détails" content={event.details} preWrap />
+            <Card>
+                <CardHeader className="pb-2">
+                    <CardTitle className="text-base flex items-center"><Info className="h-4 w-4 mr-2 text-muted-foreground" />Détails</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <p className="text-sm text-gray-600 whitespace-pre-wrap">{event.details}</p>
+                </CardContent>
+            </Card>
         )}
         
         <EventDetailsClient eventId={event.id} initialAttendance={initialAttendance} />
@@ -60,14 +73,11 @@ function formatEventDate(date: Date) {
     };
 }
 
-function InfoCard({ icon: Icon, title, content, preWrap = false }: { icon: React.ElementType, title: string, content: string, preWrap?: boolean }) {
+function InfoItem({ icon: Icon, content }: { icon: React.ElementType, content: string }) {
     return (
-        <div className="bg-white p-4 rounded-lg border">
-            <div className="flex items-center text-sm font-semibold text-gray-700 mb-1">
-                <Icon className="h-4 w-4 mr-2 text-muted-foreground" />
-                <span>{title}</span>
-            </div>
-            <p className={`text-gray-600 ${preWrap ? 'whitespace-pre-wrap' : ''}`}>{content}</p>
+        <div className="flex items-center text-sm">
+            <Icon className="h-4 w-4 mr-3 text-muted-foreground flex-shrink-0" />
+            <span className="text-gray-700">{content}</span>
         </div>
     )
 }
